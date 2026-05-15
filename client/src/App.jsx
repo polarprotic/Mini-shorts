@@ -143,7 +143,7 @@ function AuthScreen({ onLogin }) {
     setLoading(true);
     try {
       // 🚀 THE WIRING: Ask Node to email the code!
-      await axios.post("https://mini-shorts.onrender.com//api/auth/send-otp", { email });
+      await axios.post("https://mini-shorts.onrender.com/api/auth/send-otp", { email });
       setLoading(false); 
       setStep("otp");
     } catch (err) {
@@ -170,7 +170,7 @@ function AuthScreen({ onLogin }) {
     setLoading(true);
     try {
       // 🚀 THE WIRING: Check the code against Redis!
-      const response = await axios.post("https://mini-shorts.onrender.com//api/auth/verify-otp", {
+      const response = await axios.post("https://mini-shorts.onrender.com/api/auth/verify-otp", {
         email: email,
         otp: code
       });
