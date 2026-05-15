@@ -15,7 +15,16 @@ connectDB();
 connectRedis();
 
 // 2. Middleware
-app.use(cors());
+// 2. Middleware
+// Explicitly whitelist your local frontend!
+// 2. Middleware
+// This dynamically allows requests from ANY frontend (Localhost or Vercel)
+app.use(cors({
+    origin: function (origin, callback) {
+        callback(null, true);
+    },
+    credentials: true
+}));
 app.use(express.json());
 
 // 3. Register Routes
@@ -27,4 +36,4 @@ app.use('/api/reels', reelRoutes);
 app.get('/', (req, res) => res.send('API is Running...'));
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, "0.0.0.0", () => console.log(`Server running on port ${PORT}`));
