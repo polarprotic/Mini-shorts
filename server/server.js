@@ -15,7 +15,12 @@ connectDB();
 connectRedis();
 
 // 2. Middleware
-app.use(cors());
+// 2. Middleware
+// Explicitly allow all connections while we are testing!
+app.use(cors({
+    origin: "*", 
+    credentials: true
+}));
 app.use(express.json());
 
 // 3. Register Routes
