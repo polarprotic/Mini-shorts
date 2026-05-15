@@ -143,7 +143,7 @@ function AuthScreen({ onLogin }) {
     setLoading(true);
     try {
       // 🚀 THE WIRING: Ask Node to email the code!
-      await axios.post("https://mini-shorts.onrender.com/api/auth/send-otp", { email });
+      await axios.post("http://localhost:5000/api/auth/send-otp", { email });
       setLoading(false); 
       setStep("otp");
     } catch (err) {
@@ -170,7 +170,7 @@ function AuthScreen({ onLogin }) {
     setLoading(true);
     try {
       // 🚀 THE WIRING: Check the code against Redis!
-      const response = await axios.post("https://mini-shorts.onrender.com/api/auth/verify-otp", {
+      const response = await axios.post("http://localhost:5000/api/auth/verify-otp", {
         email: email,
         otp: code
       });
@@ -462,7 +462,7 @@ function UploadModal({ onClose, onUpload, currentUser }) {
       formData.append("caption", caption);
       
       // 2. 🚀 THE WIRING: Send the heavy file to your backend!
-      const response = await axios.post("https://mini-shorts.onrender.com/api/reels", formData, {
+      const response = await axios.post("http://localhost:5000/api/reels", formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
 
@@ -592,7 +592,7 @@ export default function App() {
 
   // 🪄 THE MAGIC: Now SWR uses fetchAndMeasure
   const { data: reels = [], mutate: mutateReels } = useSWR(
-    currentUser ? 'https://mini-shorts.onrender.com/api/reels' : null, 
+    currentUser ? 'http://localhost:5000/api/reels' : null, 
     fetchAndMeasure, // <--- Using the new stopwatch fetcher
     {
       refreshInterval: 2000,
@@ -637,13 +637,13 @@ export default function App() {
       if (r.id === reelId) return { ...r, likes: action === 'unlike' ? Math.max(0, r.likes - 1) : r.likes + 1 };
       return r;
     }), false);
-    try { await axios.put(`https://mini-shorts.onrender.com/api/reels/${reelId}/like`, { action }); } 
+    try { await axios.put(`http://localhost:5000/api/reels/${reelId}/like`, { action }); } 
     catch (error) { console.error("Failed to save like", error); }
   }, [mutateReels]);
 
   const handleComment = useCallback(async (reelId, comment) => {
     mutateReels(prev => prev.map(r => r.id === reelId ? { ...r, comments: [...r.comments, comment] } : r), false);
-    try { await axios.post(`https://mini-shorts.onrender.com/api/reels/${reelId}/comment`, { userId: comment.userId, text: comment.text }); } 
+    try { await axios.post(`http://localhost:5000/api/reels/${reelId}/comment`, { userId: comment.userId, text: comment.text }); } 
     catch (error) { console.error("Failed to save comment", error); }
   }, [mutateReels]);
 
@@ -654,7 +654,7 @@ export default function App() {
   const handleDelete = useCallback(async (reelId) => {
     mutateReels(prev => prev.filter(r => r.id !== reelId), false);
     try {
-      await axios.delete(`https://mini-shorts.onrender.com/api/reels/${reelId}`);
+      await axios.delete(`http://localhost:5000/api/reels/${reelId}`);
       addToast({ key: `Deleted Reel`, latency: 12, fromCache: false });
     } catch (error) { console.error("Failed to delete", error); }
   }, [addToast, mutateReels]);
