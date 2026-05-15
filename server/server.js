@@ -19,11 +19,11 @@ connectRedis();
 // Explicitly whitelist your local frontend!
 // 2. Middleware
 // This dynamically allows requests from ANY frontend (Localhost or Vercel)
+// REPLACE your current app.use(cors()) with this:
 app.use(cors({
-    origin: function (origin, callback) {
-        callback(null, true);
-    },
-    credentials: true
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
 }));
 app.use(express.json());
 
