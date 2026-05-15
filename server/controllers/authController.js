@@ -4,10 +4,15 @@ const { redisClient } = require('../config/redis');
 
 // 1. Set up the Email Transporter (Your App's "Post Office")
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false, // Must be false for port 587
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS // The 16-letter app password
+    },
+    tls: {
+        rejectUnauthorized: false // Helps bypass certain cloud networking restrictions
     }
 });
 
