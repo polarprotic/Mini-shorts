@@ -36,7 +36,7 @@ exports.uploadReel = async (req, res) => {
             caption: req.body.caption
         });
 
-        const populatedReel = await Reel.findById(newReel._id).populate('creator', 'phoneNumber name avatar');
+        const populatedReel = await Reel.findById(newReel._id).populate('creator', 'phoneNumber name avatar username bio'); // 👈 Added username and bio
         
         await clearFeedCache(); // ⚡ Wipe cache so the new video shows up!
 
@@ -70,10 +70,10 @@ exports.getReels = async (req, res) => {
 
         console.log("🐢 MONGODB MISS: Fetching fresh database records...");
         
-        // 2. Fetch fresh from DB
+       // 2. Fetch fresh from DB
         const reels = await Reel.find()
-            .populate('creator', 'phoneNumber name avatar')
-            .populate('comments.userId', 'phoneNumber name avatar')
+            .populate('creator', 'phoneNumber name avatar username bio') // 👈 Added here
+            .populate('comments.userId', 'phoneNumber name avatar username') // 👈 And here for comments!
             .sort({ createdAt: -1 });
 
         // 3. 🛡️ SAFE REDIS SAVE

@@ -7,6 +7,8 @@ const { connectRedis } = require('./config/redis');
 // Import Routes
 const reelRoutes = require('./routes/reelRoutes');
 const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
+const chatRoutes = require('./routes/chatRoutes'); // 👈 Added Chat Routes
 
 const app = express();
 
@@ -15,22 +17,14 @@ connectDB();
 connectRedis();
 
 // 2. Middleware
-// 2. Middleware
-// Explicitly whitelist your local frontend!
-// 2. Middleware
-// This dynamically allows requests from ANY frontend (Localhost or Vercel)
-// REPLACE your current app.use(cors()) with this:
-app.use(cors({
-    origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"]
-}));
+app.use(cors());
 app.use(express.json());
 
 // 3. Register Routes
-// This line connects your Auth logic to the URL: http://localhost:5000/api/auth
 app.use('/api/auth', authRoutes);
 app.use('/api/reels', reelRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/chat', chatRoutes); // 👈 Added Chat API
 
 // Health Check
 app.get('/', (req, res) => res.send('API is Running...'));

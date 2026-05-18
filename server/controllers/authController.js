@@ -1,18 +1,14 @@
+const crypto = require('crypto');
 const User = require('../models/User');
 const nodemailer = require('nodemailer');
 const { redisClient } = require('../config/redis');
 
 // 1. Set up the Email Transporter (Your App's "Post Office")
 const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // Must be false for port 587
+    service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS // The 16-letter app password
-    },
-    tls: {
-        rejectUnauthorized: false // Helps bypass certain cloud networking restrictions
     }
 });
 
@@ -71,16 +67,23 @@ exports.verifyOtp = async (req, res) => {
         // Handle MongoDB User (Login or Signup)
         let user = await User.findOne({ phoneNumber: email }); 
         
-        if (!user) {
+      if (!user) {
+            const baseUsername = email.split('@')[0]; // Extract from email
             user = await User.create({
-                phoneNumber: email, // Storing email in phoneNumber field for now
-                name: `User ${email.split('@')[0]}`, 
+                phoneNumber: email, 
+                name: `User ${baseUsername}`,
+                username: baseUsername, // 👈 NEW: Save default username to DB
                 avatar: "👤"
             });
             console.log("🌟 New user created via Email:", email);
         }
 
-        res.status(200).json(user);
+        // Generate keycard and write to Redis whiteboard
+        const sessionToken = crypto.randomBytes(16).toString('hex');
+        await redisClient.set(`session:${email}`, sessionToken);
+
+        // Send user data + token
+        res.status(200).json({ ...user.toObject(), token: sessionToken });
 
     } catch (error) {
         console.error("Verification Error:", error);
